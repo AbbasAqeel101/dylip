@@ -37,7 +37,7 @@ jobs:
             -o MyFirstDylib.dylib
 
       - name: Upload dylib as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: MyFirstDylib
           path: MyFirstDylib.dylib
