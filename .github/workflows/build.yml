@@ -1,0 +1,43 @@
+name: Build MyFirstDylib
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Get iOS SDK path
+        run: |
+          SDK=$(xcrun --sdk iphoneos --show-sdk-path)
+          echo "SDK_PATH=$SDK" >> $GITHUB_ENV
+
+      - name: Compile MyFirstDylib.dylib
+        run: |
+          xcrun clang \
+            -arch arm64 \
+            -arch arm64e \
+            -isysroot $SDK_PATH \
+            -mios-version-min=13.0 \
+            -fobjc-arc \
+            -fmodules \
+            -O2 \
+            -dynamiclib \
+            -install_name @rpath/MyFirstDylib.dylib \
+            -framework UIKit \
+            -framework Foundation \
+            -lobjc \
+            Tweak.m \
+            -o MyFirstDylib.dylib
+
+      - name: Upload dylib as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: MyFirstDylib
+          path: MyFirstDylib.dylib
